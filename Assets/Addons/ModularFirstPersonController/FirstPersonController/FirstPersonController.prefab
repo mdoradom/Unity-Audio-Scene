@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4459864850019384741}
   - component: {fileID: 4459864850019384740}
   - component: {fileID: 3988689024321356771}
+  - component: {fileID: 3350896571078899131}
   m_Layer: 0
   m_Name: FirstPersonController
   m_TagString: Player
@@ -294,6 +295,54 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3350896571078899131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4459864850019384750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dd8bbd9863ec7544b7c7702d8015ddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minVolume: 1
+  maxVolume: 1
+  minPitch: 1
+  maxPitch: 1
+  footstepsOnGrass:
+  - {fileID: 8300000, guid: b604f2f2c983a237dac40a9c3a786bf6, type: 3}
+  - {fileID: 8300000, guid: 62ebfca3b3f830812b96903df6769580, type: 3}
+  footstepsOnDirt:
+  - {fileID: 8300000, guid: 73db9f442b60f2f8ba43f7057a1ef6df, type: 3}
+  - {fileID: 8300000, guid: 83be6f472896b1386abcc6a25957c88a, type: 3}
+  - {fileID: 8300000, guid: 794e0eb6017cfe330bb029f7a89f974b, type: 3}
+  - {fileID: 8300000, guid: ec771d8d38cfb45919eaf6a7ffdb1a10, type: 3}
+  - {fileID: 8300000, guid: 205dd92563498f89e9ab4ef98d2a6a39, type: 3}
+  footstepsOnSand:
+  - {fileID: 8300000, guid: cc6d02f4442fe5b44a24683d4e527201, type: 3}
+  - {fileID: 8300000, guid: a9708f953321885e48df8f40a70f9dd2, type: 3}
+  footstepsOnWater:
+  - {fileID: 8300000, guid: 372550e55a6d11b2285d07f8bb831321, type: 3}
+  - {fileID: 8300000, guid: 44663d665c032d3c8b3350ac3ae3a615, type: 3}
+  - {fileID: 8300000, guid: c83967cafdac07efa9ebb0d1e74049d1, type: 3}
+  - {fileID: 8300000, guid: 3be166502fa083d71a2918d3b56db808, type: 3}
+  - {fileID: 8300000, guid: f73dd25b2b03ff80699bcd938398b37e, type: 3}
+  footstepsOnRock:
+  - {fileID: 8300000, guid: c86e484b5a368311b9cabe2dc5cc3503, type: 3}
+  - {fileID: 8300000, guid: 023f8a47f0a24593b8f6e8cc61cb88f6, type: 3}
+  - {fileID: 8300000, guid: 023f8a47f0a24593b8f6e8cc61cb88f6, type: 3}
+  - {fileID: 8300000, guid: 4337a8c58fe2614c683fb5b77b899115, type: 3}
+  surface: 
+  minImpactForce: 0.1
+  footstepCooldown: 0.3
+  grassTextureIndex: 0
+  dirtTextureIndex: 1
+  sandTextureIndex: 6
+  forestBirchTextureIndex: 4
+  forestTextureIndex: 5
+  rockTextureIndex: 2
 --- !u!1 &4459864850190357393
 GameObject:
   m_ObjectHideFlags: 0

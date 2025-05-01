@@ -22,6 +22,9 @@ public class PlayFootstepOnSurface : MonoBehaviour
     
     public float footstepCooldown = 0.3f;
     private float lastFootstepTime = 0f;
+
+    // Flag to track water collision
+    private bool isInWater = false;
     
     // Define terrain texture indices
     [Header("Terrain Texture Settings")]
@@ -49,37 +52,70 @@ public class PlayFootstepOnSurface : MonoBehaviour
             if (collision.gameObject.CompareTag("Water"))
             {
                 surface = "Water";
+                isInWater = true;
             }
             else if (collision.gameObject.CompareTag("Rock"))
             {
                 surface = "Rock";
             }
-
-            // Then check if we're colliding with a terrain
-            else if (collision.gameObject.GetComponent<Terrain>() != null)
+            // Only proceed with other checks if not in water
+            else if (!isInWater)
             {
-                // We hit a terrain, determine the texture at the contact point
-                Vector3 contactPoint = collision.contacts[0].point;
-                DetermineTerrainTexture(contactPoint);
-            }
-
-            // Fall back to tag-based detection for other objects
-            else if (collision.gameObject.CompareTag("Grass"))
-            {
-                surface = "Grass";
-            }
-            else if (collision.gameObject.CompareTag("Sand"))
-            {
-                surface = "Sand";
-            }
-            else if (collision.gameObject.CompareTag("Dirt"))
-            {
-                surface = "Dirt";
+                // Then check if we're colliding with a terrain
+                if (collision.gameObject.GetComponent<Terrain>() != null)
+                {
+                    // We hit a terrain, determine the texture at the contact point
+                    Vector3 contactPoint = collision.contacts[0].point;
+                    DetermineTerrainTexture(contactPoint);
+                }
+                // Fall back to tag-based detection for other objects
+                else if (collision.gameObject.CompareTag("Grass"))
+                {
+                    surface = "Grass";
+                }
+                else if (collision.gameObject.CompareTag("Sand"))
+                {
+                    surface = "Sand";
+                }
+                else if (collision.gameObject.CompareTag("Dirt"))
+                {
+                    surface = "Dirt";
+                }
             }
             
             PlayFootstepSoundSurface();
             
             lastFootstepTime = Time.time;
+        }
+    }
+
+    // Add trigger detection for water
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Water") && Time.time > lastFootstepTime + footstepCooldown)
+        {
+            surface = "Water";
+            isInWater = true;
+            
+            PlayFootstepSoundSurface();
+            
+            lastFootstepTime = Time.time;
+        }
+    }
+    
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Water"))
+        {
+            isInWater = false;
+        }
+    }
+    
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Water"))
+        {
+            isInWater = false;
         }
     }
     
