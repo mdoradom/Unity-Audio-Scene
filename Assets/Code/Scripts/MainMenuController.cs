@@ -31,6 +31,10 @@ public class MainMenuController : MonoBehaviour
         
         // Initialize
         ShowMainMenu();
+
+        // Set up cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
     
     public void PlayGame()
