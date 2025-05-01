@@ -1,0 +1,192 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayFootstepOnSurface : MonoBehaviour
+{ 
+    public float minVolume = 1.0f;
+    public float maxVolume = 1.0f;
+
+    public float minPitch = 1.0f;
+    public float maxPitch = 1.0f;
+
+    public AudioClip[] footstepsOnGrass;
+    public AudioClip[] footstepsOnDirt;
+    public AudioClip[] footstepsOnSand;
+    public AudioClip[] footstepsOnWater;
+    public AudioClip[] footstepsOnRock;
+
+    public string surface;
+    
+    public float minImpactForce = 0.1f;
+    
+    public float footstepCooldown = 0.3f;
+    private float lastFootstepTime = 0f;
+    
+    // Define terrain texture indices
+    [Header("Terrain Texture Settings")]
+    [Tooltip("Index of the grass texture in the terrain's splat map")]
+    public int grassTextureIndex = 0;
+    [Tooltip("Index of the dirt texture in the terrain's splat map")]
+    public int dirtTextureIndex = 1;
+    [Tooltip("Index of the sand texture in the terrain's splat map")]
+    public int sandTextureIndex = 6;
+    [Tooltip("Index of the forest birch texture in the terrain's splat map")]
+    public int forestBirchTextureIndex = 4;
+    [Tooltip("Index of the forest texture in the terrain's splat map")]
+    public int forestTextureIndex = 5;
+    [Tooltip("Index of the rock texture in the terrain's splat map")]
+    public int rockTextureIndex = 2;
+    
+    void OnCollisionEnter(Collision collision)
+    {
+        // Check if we've hit with enough force and enough time has passed
+        float impactForce = collision.relativeVelocity.magnitude;
+        
+        if (impactForce >= minImpactForce && Time.time > lastFootstepTime + footstepCooldown)
+        {
+            // First check for special tagged objects (water and rock)
+            if (collision.gameObject.CompareTag("Water"))
+            {
+                surface = "Water";
+            }
+            else if (collision.gameObject.CompareTag("Rock"))
+            {
+                surface = "Rock";
+            }
+
+            // Then check if we're colliding with a terrain
+            else if (collision.gameObject.GetComponent<Terrain>() != null)
+            {
+                // We hit a terrain, determine the texture at the contact point
+                Vector3 contactPoint = collision.contacts[0].point;
+                DetermineTerrainTexture(contactPoint);
+            }
+
+            // Fall back to tag-based detection for other objects
+            else if (collision.gameObject.CompareTag("Grass"))
+            {
+                surface = "Grass";
+            }
+            else if (collision.gameObject.CompareTag("Sand"))
+            {
+                surface = "Sand";
+            }
+            else if (collision.gameObject.CompareTag("Dirt"))
+            {
+                surface = "Dirt";
+            }
+            
+            PlayFootstepSoundSurface();
+            
+            lastFootstepTime = Time.time;
+        }
+    }
+    
+    private void DetermineTerrainTexture(Vector3 worldPos)
+    {
+        // Get the terrain
+        Terrain terrain = Terrain.activeTerrain;
+        TerrainData terrainData = terrain.terrainData;
+        
+        // Convert world position to terrain position
+        Vector3 terrainPos = worldPos - terrain.transform.position;
+        
+        // Calculate terrain texture coordinates (0-1)
+        float normX = terrainPos.x / terrainData.size.x;
+        float normZ = terrainPos.z / terrainData.size.z;
+        
+        // Make sure we're within bounds
+        if (normX < 0 || normX > 1 || normZ < 0 || normZ > 1)
+        {
+            return;
+        }
+        
+        // Get the splat map coordinates
+        float mapX = normX * terrainData.alphamapWidth;
+        float mapZ = normZ * terrainData.alphamapHeight;
+        
+        // Get the splat data for this cell
+        float[,,] splatmapData = terrainData.GetAlphamaps(
+            Mathf.FloorToInt(mapX),
+            Mathf.FloorToInt(mapZ), 1, 1);
+        
+        // Get the dominant texture
+        float highestValue = 0;
+        int dominantTextureIndex = 0;
+        
+        // For each texture on the terrain
+        for (int i = 0; i < terrainData.alphamapLayers; i++)
+        {
+            // The strength of this texture at this point
+            float textureStrength = splatmapData[0, 0, i];
+            
+            if (textureStrength > highestValue)
+            {
+                highestValue = textureStrength;
+                dominantTextureIndex = i;
+            }
+        }
+        
+        // Set the surface based on the dominant texture index
+        if (dominantTextureIndex == grassTextureIndex)
+        {
+            surface = "Grass";
+        }
+        else if (dominantTextureIndex == dirtTextureIndex)
+        {
+            surface = "Dirt";
+        }
+        else if (dominantTextureIndex == sandTextureIndex)
+        {
+            surface = "Sand";
+        }
+        else if (dominantTextureIndex == forestBirchTextureIndex)
+        {
+            surface = "Grass";
+        }
+        else if (dominantTextureIndex == forestTextureIndex)
+        {
+            surface = "Grass";
+        }
+        else if (dominantTextureIndex == rockTextureIndex)
+        {
+            surface = "Rock";
+        }
+        else
+        {
+            // Default to a surface type if none matches
+            surface = "Dirt";
+        }
+    }
+    
+    void PlayFootstepSoundSurface()
+    {
+        AudioSource audioSource = GetComponent<AudioSource>();
+        audioSource.volume = Random.Range(minVolume, maxVolume);
+        audioSource.pitch = Random.Range(minPitch, maxPitch);
+
+        switch (surface)
+        { 
+            case "Grass":
+                audioSource.clip = footstepsOnGrass[Random.Range(0, footstepsOnGrass.Length)];
+                break;
+            case "Sand":
+                audioSource.clip = footstepsOnSand[Random.Range(0, footstepsOnSand.Length)];
+                break;
+            case "Dirt":
+                audioSource.clip = footstepsOnDirt[Random.Range(0, footstepsOnDirt.Length)];
+                break;
+            case "Water":
+                audioSource.clip = footstepsOnWater[Random.Range(0, footstepsOnWater.Length)];
+                break;
+            case "Rock":
+                audioSource.clip = footstepsOnRock[Random.Range(0, footstepsOnRock.Length)];
+                break;
+            default:
+                break;
+        } 
+
+        audioSource.Play();
+    }
+}
