@@ -6,10 +6,11 @@ using TMPro;
 public class OptionsMenuController : MonoBehaviour
 {
     [Header("Audio Settings")]
-    [SerializeField] private AudioMixer masterMixer;
+    [SerializeField] private AudioMixer globalMixer;
     [SerializeField] private Slider masterVolumeSlider;
     [SerializeField] private Slider musicVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
+    [SerializeField] private Slider ambienceVolumeSlider;
     
     [Header("Mouse Settings")]
     [SerializeField] private Slider mouseSensitivitySlider;
@@ -25,6 +26,7 @@ public class OptionsMenuController : MonoBehaviour
     private const string MasterVolume = "MasterVolume";
     private const string MusicVolume = "MusicVolume";
     private const string SFXVolume = "SFXVolume";
+    private const string AmbienceVolume = "AmbienceVolume";
     private const string MouseSensitivity = "MouseSensitivity";
     
     private void Start()
@@ -37,6 +39,7 @@ public class OptionsMenuController : MonoBehaviour
         masterVolumeSlider.onValueChanged.AddListener(SetMasterVolume);
         musicVolumeSlider.onValueChanged.AddListener(SetMusicVolume);
         sfxVolumeSlider.onValueChanged.AddListener(SetSFXVolume);
+        ambienceVolumeSlider.onValueChanged.AddListener(SetAmbienceVolume);
         mouseSensitivitySlider.onValueChanged.AddListener(SetMouseSensitivity);
         
         // Load saved settings
@@ -49,12 +52,14 @@ public class OptionsMenuController : MonoBehaviour
         masterVolumeSlider.value = PlayerPrefs.GetFloat(MasterVolume, 0.75f);
         musicVolumeSlider.value = PlayerPrefs.GetFloat(MusicVolume, 0.75f);
         sfxVolumeSlider.value = PlayerPrefs.GetFloat(SFXVolume, 0.75f);
+        ambienceVolumeSlider.value = PlayerPrefs.GetFloat(AmbienceVolume, 0.75f);
         mouseSensitivitySlider.value = PlayerPrefs.GetFloat(MouseSensitivity, 1.0f);
         
         // Apply loaded values
         SetMasterVolume(masterVolumeSlider.value);
         SetMusicVolume(musicVolumeSlider.value);
         SetSFXVolume(sfxVolumeSlider.value);
+        SetAmbienceVolume(ambienceVolumeSlider.value);
         SetMouseSensitivity(mouseSensitivitySlider.value);
     }
     
@@ -64,6 +69,7 @@ public class OptionsMenuController : MonoBehaviour
         PlayerPrefs.SetFloat(MasterVolume, masterVolumeSlider.value);
         PlayerPrefs.SetFloat(MusicVolume, musicVolumeSlider.value);
         PlayerPrefs.SetFloat(SFXVolume, sfxVolumeSlider.value);
+        PlayerPrefs.SetFloat(AmbienceVolume, ambienceVolumeSlider.value);
         PlayerPrefs.SetFloat(MouseSensitivity, mouseSensitivitySlider.value);
         PlayerPrefs.Save();
     }
@@ -71,17 +77,22 @@ public class OptionsMenuController : MonoBehaviour
     public void SetMasterVolume(float volume)
     {
         // Convert slider value (0 to 1) to decibels (-80 to 0)
-        masterMixer.SetFloat(MasterVolume, Mathf.Log10(volume) * 20);
+        globalMixer.SetFloat(MasterVolume, Mathf.Log10(volume) * 20);
     }
     
     public void SetMusicVolume(float volume)
     {
-        masterMixer.SetFloat(MusicVolume, Mathf.Log10(volume) * 20);
+        globalMixer.SetFloat(MusicVolume, Mathf.Log10(volume) * 20);
     }
     
     public void SetSFXVolume(float volume)
     {
-        masterMixer.SetFloat(SFXVolume, Mathf.Log10(volume) * 20);
+        globalMixer.SetFloat(SFXVolume, Mathf.Log10(volume) * 20);
+    }
+    
+    public void SetAmbienceVolume(float volume)
+    {
+        globalMixer.SetFloat(AmbienceVolume, Mathf.Log10(volume) * 20);
     }
     
     public void SetMouseSensitivity(float sensitivity)
