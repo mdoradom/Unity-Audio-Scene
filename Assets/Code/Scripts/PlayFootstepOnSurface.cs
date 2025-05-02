@@ -18,10 +18,18 @@ public class PlayFootstepOnSurface : MonoBehaviour
 
     public string surface;
     
-    public float minImpactForce = 0.1f;
-    
-    public float footstepCooldown = 0.3f;
+    [Header("Footstep Settings")]
+    public float footstepCooldown = 0.3f;  // Base time between steps
+    public float footstepDistance = 2.0f;  // Distance needed to travel for a step
     private float lastFootstepTime = 0f;
+    private Vector3 lastPosition;
+    private float distanceTraveled = 0f;
+    
+    [Header("Movement Detection")]
+    public float minMovementSpeed = 0.1f;  // Minimum speed to play footsteps
+    private Rigidbody rb;
+    private bool isGrounded = false;
+    private bool isMoving = false;
 
     // Flag to track water collision
     private bool isInWater = false;
@@ -40,52 +48,97 @@ public class PlayFootstepOnSurface : MonoBehaviour
     public int forestTextureIndex = 5;
     [Tooltip("Index of the rock texture in the terrain's splat map")]
     public int rockTextureIndex = 2;
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        lastPosition = transform.position;
+    }
+
+    private void Update()
+    {
+        // Check if we're moving
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        isMoving = horizontalVelocity.magnitude > minMovementSpeed;
+        
+        // Calculate distance traveled
+        distanceTraveled += Vector3.Distance(transform.position, lastPosition);
+        lastPosition = transform.position;
+        
+        // If we're grounded, moving, and have traveled enough distance
+        if (isGrounded && isMoving && distanceTraveled >= footstepDistance && Time.time > lastFootstepTime + footstepCooldown)
+        {
+            PlayFootstepSoundSurface();
+            lastFootstepTime = Time.time;
+            distanceTraveled = 0f;
+        }
+    }
     
     void OnCollisionEnter(Collision collision)
     {
-        // Check if we've hit with enough force and enough time has passed
-        float impactForce = collision.relativeVelocity.magnitude;
-        
-        if (impactForce >= minImpactForce && Time.time > lastFootstepTime + footstepCooldown)
+        HandleCollision(collision);
+        isGrounded = true;
+    }
+    
+    void OnCollisionStay(Collision collision)
+    {
+        HandleCollision(collision);
+        isGrounded = true;
+    }
+    
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Water"))
         {
-            // First check for special tagged objects (water and rock)
-            if (collision.gameObject.CompareTag("Water"))
+            isInWater = false;
+        }
+        
+        // Check if we've left the ground
+        if (collision.gameObject.GetComponent<Terrain>() != null || 
+            collision.gameObject.CompareTag("Grass") ||
+            collision.gameObject.CompareTag("Sand") ||
+            collision.gameObject.CompareTag("Dirt") ||
+            collision.gameObject.CompareTag("Rock"))
+        {
+            isGrounded = false;
+        }
+    }
+    
+    private void HandleCollision(Collision collision)
+    {
+        // First check for special tagged objects (water and rock)
+        if (collision.gameObject.CompareTag("Water"))
+        {
+            surface = "Water";
+            isInWater = true;
+        }
+        else if (collision.gameObject.CompareTag("Rock"))
+        {
+            surface = "Rock";
+        }
+        // Only proceed with other checks if not in water
+        else if (!isInWater)
+        {
+            // Then check if we're colliding with a terrain
+            if (collision.gameObject.GetComponent<Terrain>() != null)
             {
-                surface = "Water";
-                isInWater = true;
+                // We hit a terrain, determine the texture at the contact point
+                Vector3 contactPoint = collision.contacts[0].point;
+                DetermineTerrainTexture(contactPoint);
             }
-            else if (collision.gameObject.CompareTag("Rock"))
+            // Fall back to tag-based detection for other objects
+            else if (collision.gameObject.CompareTag("Grass"))
             {
-                surface = "Rock";
+                surface = "Grass";
             }
-            // Only proceed with other checks if not in water
-            else if (!isInWater)
+            else if (collision.gameObject.CompareTag("Sand"))
             {
-                // Then check if we're colliding with a terrain
-                if (collision.gameObject.GetComponent<Terrain>() != null)
-                {
-                    // We hit a terrain, determine the texture at the contact point
-                    Vector3 contactPoint = collision.contacts[0].point;
-                    DetermineTerrainTexture(contactPoint);
-                }
-                // Fall back to tag-based detection for other objects
-                else if (collision.gameObject.CompareTag("Grass"))
-                {
-                    surface = "Grass";
-                }
-                else if (collision.gameObject.CompareTag("Sand"))
-                {
-                    surface = "Sand";
-                }
-                else if (collision.gameObject.CompareTag("Dirt"))
-                {
-                    surface = "Dirt";
-                }
+                surface = "Sand";
             }
-            
-            PlayFootstepSoundSurface();
-            
-            lastFootstepTime = Time.time;
+            else if (collision.gameObject.CompareTag("Dirt"))
+            {
+                surface = "Dirt";
+            }
         }
     }
 
@@ -98,7 +151,6 @@ public class PlayFootstepOnSurface : MonoBehaviour
             isInWater = true;
             
             PlayFootstepSoundSurface();
-            
             lastFootstepTime = Time.time;
         }
     }
@@ -106,14 +158,6 @@ public class PlayFootstepOnSurface : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Water"))
-        {
-            isInWater = false;
-        }
-    }
-    
-    void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Water"))
         {
             isInWater = false;
         }
