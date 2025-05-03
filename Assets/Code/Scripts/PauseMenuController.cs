@@ -15,7 +15,7 @@ public class PauseMenuController : MonoBehaviour
     [SerializeField] private Button exitButton;
     
     [Header("Game Settings")]
-    [SerializeField] private string mainMenuSceneName = "MainMenu";
+    [SerializeField] private string mainMenuSceneName = "MainScene";
     
     private bool isPaused = false;
     

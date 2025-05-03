@@ -196,6 +196,12 @@ public class FirstPersonController : MonoBehaviour
         }
 
         #endregion
+
+        // Load sensitivity from PlayerPrefs
+        if (PlayerPrefs.HasKey("MouseSensitivity"))
+        {
+            mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", mouseSensitivity);
+        }
     }
 
     float camRotation;

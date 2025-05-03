@@ -35,6 +35,9 @@ public class MainMenuController : MonoBehaviour
         // Set up cursor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        // Time scale should be 1 when starting the game
+        Time.timeScale = 1f;
     }
     
     public void PlayGame()
