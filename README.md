@@ -4,6 +4,8 @@
 
 An immersive 3D environment showcasing advanced Unity audio implementation techniques with spatial audio, dynamic music transitions, and responsive sound design.
 
+Extended documentation in [this document](https://github.com/mdoradom/Unity-Audio-Scene/blob/main/Docs/Ejercicio%203%20Unity%20-%20Sonorizaci%C3%B3n%20de%20una%20Escena%203D%20en%20Unity.pdf) (in spanish).
+
 ## Overview
 
 This project demonstrates professional audio implementation techniques in Unity, focusing on creating a believable and immersive soundscape for 3D environments. The project features dynamic surface-based footsteps, music zone transitions, cave reverb effects, and a complete audio mixer system.
