@@ -32,10 +32,10 @@ public class OptionsMenuController : MonoBehaviour
     [SerializeField] private PauseMenuController pauseMenuController;
     [SerializeField] private GameObject optionsPanel;
     
-    private const string MasterVolume = "MasterMixer";
-    private const string MusicVolume = "Music";
-    private const string SFXVolume = "SFX";
-    private const string AmbienceVolume = "Ambience";
+    private const string MasterVolume = "MasterVolume";
+    private const string MusicVolume = "MusicVolume";
+    private const string SFXVolume = "SFXVolume";
+    private const string AmbienceVolume = "AmbienceVolume";
     private const string MouseSensitivity = "MouseSensitivity";
     
     private string currentScene;
