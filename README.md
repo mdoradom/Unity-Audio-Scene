@@ -1,6 +1,10 @@
 # Unity Audio Scene
 
+![image](https://github.com/user-attachments/assets/592cb1fa-81c2-4094-a427-bea2547ffe13)
+
 An immersive 3D environment showcasing advanced Unity audio implementation techniques with spatial audio, dynamic music transitions, and responsive sound design.
+
+Extended documentation in [this document](https://github.com/mdoradom/Unity-Audio-Scene/blob/main/Docs/Ejercicio%203%20Unity%20-%20Sonorizaci%C3%B3n%20de%20una%20Escena%203D%20en%20Unity.pdf) (in spanish).
 
 ## Overview
 
